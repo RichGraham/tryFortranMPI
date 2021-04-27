@@ -7,9 +7,11 @@ program tryMPI
   integer process_Rank, size_Of_Cluster, ierror, tag
   double precision, dimension (nTraining, nDimensions, nAtoms, nAtoms) :: exponentials
   double precision sum
-  integer i,j,Delta, Gamma
+  double precision:: myNumber = 21.d0
+  integer i,j,Delta, Gamma, message_Item
 
-  print *,exp(1.d0)
+  print *,process_Rank
+  STOP
   
   do i=1, nTraining
      do j=1, nDimensions
@@ -40,8 +42,24 @@ program tryMPI
   call MPI_COMM_SIZE(MPI_COMM_WORLD, size_Of_Cluster, ierror)
   call MPI_COMM_RANK(MPI_COMM_WORLD, process_Rank, ierror)
 
-  print *, 'Hello World from process: ', process_Rank, 'of ', size_Of_Cluster
 
+  DO i = 0, 10
+     IF(i == process_Rank) THEN
+        print *, 'Hello World from process: ', process_Rank, 'of ', size_Of_Cluster
+     END IF
+     call MPI_BARRIER( MPI_COMM_WORLD, ierror)
+  END DO
+
+  
+  IF(process_Rank == 0) THEN
+     message_Item = 42
+     call MPI_SEND(message_Item, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, ierror)  
+     print *, "Sending message containing: ", message_Item
+  ELSE IF(process_Rank == 1) THEN
+     call MPI_RECV(message_Item, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE, ierror)
+     print *, "Received message containing: ", message_Item
+  END IF
+  
   call MPI_FINALIZE(ierror)
 
 end program tryMPI
