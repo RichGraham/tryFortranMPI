@@ -1,6 +1,6 @@
-VPATH = ./
+VPATH = ./ src/
 # Find all source files, create a list of corresponding object files
-SRCS=arraySizes.F90 main.F90 
+SRCS=MPI_Variables.F90 sum_func.F90 main.F90
 OBJS=$(patsubst %.F90,%.o,$(SRCS))
 
 # Ditto for mods (They will be in both lists)
@@ -9,8 +9,8 @@ MOD_OBJS=$(patsubst %.F90,%.o,$(MODS))
 
 # Compiler/Linker settings
 FC = mpif90
-FCFLAGS =  -c -cpp  -Wall -Wextra -Wconversion -Wno-unused-parameter -ffpe-trap=invalid -ffpe-trap=zero,overflow,underflow -fbacktrace -fdump-core -fcheck=bounds -Wno-tabs  #-fmax-errors=5
-FLFLAGS =  -g -Wall -DDEBUG -Wextra -Wconversion  -ffpe-trap=invalid -ffpe-trap=zero,overflow,underflow -fbacktrace -fdump-core -fcheck=bounds -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib   #-fmax-errors=5
+FCFLAGS =  -c -cpp # -Wall -Wextra -Wconversion -Wno-unused-parameter -ffpe-trap=invalid -ffpe-trap=zero,overflow,underflow -fbacktrace -fdump-core -fcheck=bounds -Wno-tabs  #-fmax-errors=5
+FLFLAGS =  #-g -Wall -DDEBUG -Wextra -Wconversion  -ffpe-trap=invalid -ffpe-trap=zero,overflow,underflow -fbacktrace -fdump-core -fcheck=bounds -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib   #-fmax-errors=5
 PROGRAM = mpi_fortran.out
 PRG_OBJ = $(PROGRAM).o
 
