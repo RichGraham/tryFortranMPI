@@ -9,8 +9,8 @@ MOD_OBJS=$(patsubst %.F90,%.o,$(MODS))
 
 # Compiler/Linker settings
 FC = mpif90
-FCFLAGS =  -c -cpp # -Wall -Wextra -Wconversion -Wno-unused-parameter -ffpe-trap=invalid -ffpe-trap=zero,overflow,underflow -fbacktrace -fdump-core -fcheck=bounds -Wno-tabs  #-fmax-errors=5
-FLFLAGS =  #-g -Wall -DDEBUG -Wextra -Wconversion  -ffpe-trap=invalid -ffpe-trap=zero,overflow,underflow -fbacktrace -fdump-core -fcheck=bounds -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib   #-fmax-errors=5
+FCFLAGS =  -c -cpp  -Wall -Wextra -Wconversion -Wno-unused-parameter -ffpe-trap=invalid -ffpe-trap=zero,overflow,underflow -fbacktrace -fdump-core -fcheck=bounds -Wno-tabs  #-fmax-errors=5
+FLFLAGS =  -g -Wall -DDEBUG -Wextra -Wconversion  -ffpe-trap=invalid -ffpe-trap=zero,overflow,underflow -fbacktrace -fdump-core -fcheck=bounds   #-fmax-errors=5
 PROGRAM = mpi_fortran.out
 PRG_OBJ = $(PROGRAM).o
 
