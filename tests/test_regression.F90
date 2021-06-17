@@ -7,23 +7,20 @@ module test_regression
   double precision:: regression_tolerance=1e-5
 
 contains
+
   !@test
   subroutine initialise()
-    !implicit none
-
     call MPI_INIT(ierror)
     call MPI_COMM_SIZE(MPI_COMM_WORLD, size_Of_Cluster, ierror)
     call MPI_COMM_RANK(MPI_COMM_WORLD, process_Rank, ierror)
 
-
-#line 19 "/Users/pmzrsg/source/tryFortranMPI/tests/test_regression.pf"
+#line 17 "/Users/pmzrsg/source/tryFortranMPI/tests/test_regression.pf"
   call assertEqual(root, 0 ,'Initialisation', &
  & location=SourceLocation( &
  & 'test_regression.pf', &
- & 19) )
+ & 17) )
   if (anyExceptions()) return
-#line 20 "/Users/pmzrsg/source/tryFortranMPI/tests/test_regression.pf"
-
+#line 18 "/Users/pmzrsg/source/tryFortranMPI/tests/test_regression.pf"
   end subroutine initialise
   !===========================================================================================
 
@@ -31,33 +28,28 @@ contains
 
   !@test
   subroutine test_sum()
-    implicit none
+    integer answer,i
+    integer:: nTerms=2*3*4 !!Divisible by 2,3,4,6,8,12,16, etc
 
-    integer answer
-    integer:: nTerms=8*9*10
+    do i=1,10
+       answer = sumFunc( nTerms)
 
-
-    call MPI_Barrier(  MPI_COMM_WORLD, ierror)
-
-
-
-    answer = sumFunc( nTerms)
-
-
-    call MPI_Barrier(  MPI_COMM_WORLD, ierror)
-
-
-    if( process_Rank == 0 ) then
-#line 45 "/Users/pmzrsg/source/tryFortranMPI/tests/test_regression.pf"
+       if( process_Rank == 0 ) then
+#line 32 "/Users/pmzrsg/source/tryFortranMPI/tests/test_regression.pf"
   call assertEqual(answer, 10*nTerms + (nTerms+1)*nTerms/2 ,'Initialisation', &
  & location=SourceLocation( &
  & 'test_regression.pf', &
- & 45) )
+ & 32) )
   if (anyExceptions()) return
-#line 46 "/Users/pmzrsg/source/tryFortranMPI/tests/test_regression.pf"
-    end if
+#line 33 "/Users/pmzrsg/source/tryFortranMPI/tests/test_regression.pf"
+       end if
+
+       nTerms = nTerms * 2
+    enddo
+
 
   end subroutine test_sum
+
 
 
 
@@ -65,7 +57,6 @@ contains
   !===========================================================================================
   !@test
   subroutine test_finalize()
-    implicit none
     call MPI_FINALIZE(ierror)
   end subroutine test_finalize
 

@@ -26,9 +26,9 @@ contains
 
     if (process_Rank == root) then
        global = [ (i, i=1,global_size) ]
-       print *,'Total elements:',global_size
-       print *,'Number of processes:',size_Of_Cluster
-       print *,'Elements per process:',array_size
+       !print *,'Total elements:',global_size
+       !print *,'Number of processes:',size_Of_Cluster
+       !print *,'Elements per process:',array_size
     endif
 
     call MPI_Scatter(global, array_size, MPI_INTEGER, &    ! send everyone 2 ints from global
@@ -51,7 +51,7 @@ contains
   
   if (process_Rank == root) then
      !print*,results
-
+     sum=0
      do i=1, global_size
         sum = sum + results(i)
      enddo

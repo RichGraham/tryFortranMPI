@@ -37,6 +37,10 @@ debug:
 
 clean:
 	rm -rf $(OBJS) $(PROGRAM) $(patsubst %.o,%.mod,$(MOD_OBJS)) *.mod
+	$(RM) src/*.o src/*.mod src/*.a  src/*.inc
+	$(RM) tests/*.o tests/*.mod tests/*.a  tests/*.inc
+	$(RM) tests/test_regression.F90 
+
 
 .PHONY: debug default clean
 
