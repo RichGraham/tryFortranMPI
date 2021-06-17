@@ -1,7 +1,10 @@
+SHELL := /bin/bash
+
 FC := mpif90
 
 
-LATEST_PFUNIT_DIR := /Users/pmzrsg/pFUnit/build/installed/PFUNIT-4.1
+LATEST_PFUNIT_DIR=$(PFUNIT_DIR)
+#LATEST_PFUNIT_DIR := /Users/pmzrsg/pFUnit/build/installed/PFUNIT-4.1
 include $(LATEST_PFUNIT_DIR)/include/PFUNIT.mk
 
 all: test_regression
@@ -23,6 +26,7 @@ $(eval $(call make_pfunit_test,test_regression))
 error_handling_driver.o: throw_with_pfunit.o
 
 clean:
+	echo $(LATEST_PFUNIT_DIR)
 	$(RM) *.o *.mod *.a  *.inc
 	$(RM) test_regression.F90 
 

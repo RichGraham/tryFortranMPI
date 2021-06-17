@@ -3,6 +3,7 @@ A basic mpi function with tests in Fortran.
 
 ====Local setup====
 UoN HPC: run - source UoN_HPC_SetUp.sh
+Mac: run - source Mac_SetUp.sh
 
 ====Running====
 build_and_run.x - builds and runs the basic code
