@@ -14,13 +14,13 @@ contains
     call MPI_COMM_SIZE(MPI_COMM_WORLD, size_Of_Cluster, ierror)
     call MPI_COMM_RANK(MPI_COMM_WORLD, process_Rank, ierror)
 
-#line 17 "/Users/pmzrsg/source/tryFortranMPI/tests/test_regression.pf"
+#line 17 "/gpfs01/home/pmzrsg/source/tryFortranMPI/tests/test_regression.pf"
   call assertEqual(root, 0 ,'Initialisation', &
  & location=SourceLocation( &
  & 'test_regression.pf', &
  & 17) )
   if (anyExceptions()) return
-#line 18 "/Users/pmzrsg/source/tryFortranMPI/tests/test_regression.pf"
+#line 18 "/gpfs01/home/pmzrsg/source/tryFortranMPI/tests/test_regression.pf"
   end subroutine initialise
   !===========================================================================================
 
@@ -35,13 +35,13 @@ contains
        answer = sumFunc( nTerms)
 
        if( process_Rank == 0 ) then
-#line 32 "/Users/pmzrsg/source/tryFortranMPI/tests/test_regression.pf"
+#line 32 "/gpfs01/home/pmzrsg/source/tryFortranMPI/tests/test_regression.pf"
   call assertEqual(answer, 10*nTerms + (nTerms+1)*nTerms/2 ,'Initialisation', &
  & location=SourceLocation( &
  & 'test_regression.pf', &
  & 32) )
   if (anyExceptions()) return
-#line 33 "/Users/pmzrsg/source/tryFortranMPI/tests/test_regression.pf"
+#line 33 "/gpfs01/home/pmzrsg/source/tryFortranMPI/tests/test_regression.pf"
        end if
 
        nTerms = nTerms * 2
