@@ -23,9 +23,9 @@ program sharedmemtest
 
   ! Specify size of window where shared array is located (is this a good
   ! description?!)
-  if (hostrank == 0) then
+  !if (hostrank == 0) then ! switching if statement on doesn't change output
     windowsize = int(10**4,MPI_ADDRESS_KIND)*8_MPI_ADDRESS_KIND !*8 for double ! Put the actual data size here
-  end if
+  !end if
 
   ! Allocate memory in window made above to each process
   disp_unit = 1
