@@ -5,10 +5,10 @@ program sharedmemtest
   integer, parameter :: dp = selected_real_kind(14,200)
   integer :: win,win2,hostcomm,hostrank
   INTEGER(KIND=MPI_ADDRESS_KIND) :: windowsize
-  INTEGER :: disp_unit,my_rank,ierr,total
+  INTEGER :: disp_unit,my_rank,ierr,total,i
   TYPE(C_PTR) :: baseptr,baseptr2
-  real(dp), POINTER :: matrix_elementsy(:,:,:,:)
-  integer,allocatable :: arrayshape(:)
+  real(dp), POINTER :: matrix_elementsy(:,:)
+  integer,allocatable :: shapeArray(:)
 
   call MPI_INIT( ierr )
 
@@ -17,41 +17,61 @@ program sharedmemtest
   CALL MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, 0, MPI_INFO_NULL, hostcomm,ierr)
   CALL MPI_Comm_rank(hostcomm, hostrank,ierr)
 
-  ! Gratefully based on: http://stackoverflow.com/questions/24797298/mpi-fortran-code-how-to-share-data-on-node-via-openmp                                                                                                                                                     
-  ! and https://gcc.gnu.org/onlinedocs/gfortran/C_005fF_005fPOINTER.html                                                                                                                                                                                                       
-  ! We only want one process per host to allocate memory                                                                                                                                                                                                                       
-  ! Set size to 0 in all processes but one                                                                                                                                                                                                                                     
-  allocate(arrayshape(4))
-  arrayshape=(/ 10,10,10,10 /)
+  ! Allocate array that specifies shape of matrix both procs will edit
+  allocate(shapeArray(2))
+  shapeArray=(/ 2,2 /)
+
+  ! Specify size of window where shared array is located (is this a good
+  ! description?!)
   if (hostrank == 0) then
-     windowsize = int(10**4,MPI_ADDRESS_KIND)*8_MPI_ADDRESS_KIND !*8 for double ! Put the actual data size here                                                                                                                                                                
-  else
-     windowsize = 0_MPI_ADDRESS_KIND
+    windowsize = int(10**4,MPI_ADDRESS_KIND)*8_MPI_ADDRESS_KIND !*8 for double ! Put the actual data size here
   end if
+
+  ! Allocate memory in window made above to each process
   disp_unit = 1
   CALL MPI_Win_allocate_shared(windowsize, disp_unit, MPI_INFO_NULL, hostcomm, baseptr, win, ierr)    
 
-  ! Obtain the location of the memory segment                                                                                                                                                                                                                                  
+  ! Obtain the location of the memory segment
   if (hostrank /= 0) then
      CALL MPI_Win_shared_query(win, 0, windowsize, disp_unit, baseptr, ierr)     
   end if
 
-  ! baseptr can now be associated with a Fortran pointer                                                                                                                                                                                                                       
-  ! and thus used to access the shared data                                                                                                                                                                                                                                    
-  CALL C_F_POINTER(baseptr, matrix_elementsy,arrayshape)
+  ! baseptr can now be associated with a Fortran pointer                                                                                                 
+  ! and thus used to access the shared data
+  CALL C_F_POINTER(baseptr, matrix_elementsy,shapeArray)
 
-  !!! your code here!                                                                                                                                                                                                                                                          
-  !!! sample below                                                                                                                                                                                                                                                             
+  !=============================sample code=============================
 
-  if (hostrank == 0) then
-     matrix_elementsy=0.0_dp
-     matrix_elementsy(1,2,3,4)=1.0_dp
+  ! Have each process fill in part of the shared array
+  matrix_elementsy=0.0_dp
+  if (hostrank == 0) then ! Use hostrank not my_rank here as the former starts
+                          ! from 0 for each subgroup so this is more general
+                          ! (e.g. if there were four procs in two subgroups, 1,2
+                          ! and 3,4, then using my_rank would mean the first row
+                          ! would only be correct for the first subgroup)
+     print *, ' ' ! Only works w/ this print statement switched on (?!?!)
+     matrix_elementsy(1,1)=1.0_dp
+     matrix_elementsy(1,2)=2.0_dp
+  else
+     matrix_elementsy(2,1)=3.0_dp
+     matrix_elementsy(2,2)=4.0_dp
   end if
   CALL MPI_WIN_FENCE(0, win, ierr)
+  call MPI_BARRIER(MPI_COMM_WORLD,ierr)
 
-  print *,"my_rank=",my_rank,matrix_elementsy(1,2,3,4),matrix_elementsy(1,2,3,5)
+  ! Print the full shared array as it appears on each process; it should be
+  ! identical
+  do i=1,Total
+    if (my_rank == i-1) then
+    print *, ' '
+    print *, my_rank
+    print *, matrix_elementsy(1,:)
+    print *, matrix_elementsy(2,:)
+    end if
+    call MPI_BARRIER(MPI_COMM_WORLD,ierr)
+  end do
 
-  !!! end sample code                                                                                                                                                                                                                                                          
+  !=============================end sample code=============================
 
   call MPI_WIN_FENCE(0, win, ierr) 
   call MPI_BARRIER(MPI_COMM_WORLD,ierr) 
