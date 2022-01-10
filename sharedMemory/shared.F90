@@ -3,10 +3,10 @@ program sharedmemtest
   use mpi
   implicit none
   integer, parameter :: dp = selected_real_kind(14,200)
-  integer :: win,win2,hostcomm,hostrank
+  integer :: win,hostcomm,hostrank
   INTEGER(KIND=MPI_ADDRESS_KIND) :: windowsize
   INTEGER :: disp_unit,my_rank,ierr,total,i
-  TYPE(C_PTR) :: baseptr,baseptr2
+  TYPE(C_PTR) :: baseptr
   real(dp), POINTER :: matrix_elementsy(:,:)
   integer,allocatable :: shapeArray(:)
 
@@ -49,7 +49,7 @@ program sharedmemtest
                           ! (e.g. if there were four procs in two subgroups, 1,2
                           ! and 3,4, then using my_rank would mean the first row
                           ! would only be correct for the first subgroup)
-     print *, ' ' ! Only works w/ this print statement switched on (?!?!)
+     !print *, ' ' ! Only works w/ this print statement switched on (?!?!)
      matrix_elementsy(1,1)=1.0_dp
      matrix_elementsy(1,2)=2.0_dp
   else
