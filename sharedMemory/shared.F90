@@ -75,6 +75,7 @@ program sharedmemtest
     print *, matrix_elementsy(1,:)
     print *, matrix_elementsy(2,:)
     end if
+    CALL MPI_WIN_FENCE(0, win, ierr)
     call MPI_BARRIER(MPI_COMM_WORLD,ierr)
   end do
 
