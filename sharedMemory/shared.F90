@@ -21,17 +21,19 @@ program sharedmemtest
   allocate(shapeArray(2))
   shapeArray=(/ 2,2 /)
 
-  ! Specify size of window where shared array is located (is this a good
-  ! description?!)
-  !if (hostrank == 0) then ! switching if statement on doesn't change output
+  ! Specify size of window where shared array is located
+  if (hostrank == 0) then ! switching if statement on doesn't change output
     windowsize = int(10**4,MPI_ADDRESS_KIND)*8_MPI_ADDRESS_KIND !*8 for double ! Put the actual data size here
-  !end if
+  else
+    windowsize = 0_MPI_ADDRESS_KIND ! Window will be shared between procs so only need to specify it's size on one
+  end if
 
   ! Allocate memory in window made above to each process
   disp_unit = 1
   CALL MPI_Win_allocate_shared(windowsize, disp_unit, MPI_INFO_NULL, hostcomm, baseptr, win, ierr)    
 
-  ! Obtain the location of the memory segment
+  ! Obtain the location of the memory segment for the procs where
+  ! windowsize=0
   if (hostrank /= 0) then
      CALL MPI_Win_shared_query(win, 0, windowsize, disp_unit, baseptr, ierr)     
   end if
@@ -43,13 +45,18 @@ program sharedmemtest
   !=============================sample code=============================
 
   ! Have each process fill in part of the shared array
+  CALL MPI_WIN_FENCE(0, win, ierr) ! Wrap all operations on the window with this
+                                   ! call. A process that has finished all such
+                                   ! operations will be held back from accessing
+                                   ! the part of the window covered by another
+                                   ! process until the latter process has
+                                   ! finished its work in the window too.
   matrix_elementsy=0.0_dp
   if (hostrank == 0) then ! Use hostrank not my_rank here as the former starts
                           ! from 0 for each subgroup so this is more general
                           ! (e.g. if there were four procs in two subgroups, 1,2
                           ! and 3,4, then using my_rank would mean the first row
                           ! would only be correct for the first subgroup)
-     !print *, ' ' ! Only works w/ this print statement switched on (?!?!)
      matrix_elementsy(1,1)=1.0_dp
      matrix_elementsy(1,2)=2.0_dp
   else
@@ -73,7 +80,6 @@ program sharedmemtest
 
   !=============================end sample code=============================
 
-  call MPI_WIN_FENCE(0, win, ierr) 
   call MPI_BARRIER(MPI_COMM_WORLD,ierr) 
   call MPI_Win_free(win,ierr)     
   call MPI_FINALIZE(IERR)
