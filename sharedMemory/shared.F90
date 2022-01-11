@@ -45,7 +45,7 @@ program sharedmemtest
 
   !=============================sample code=============================
 
-  ! Have each process fill in part of the shared array
+  ! Have each process fill in part of the shared array.
   ! Use hostrank not my_rank to fill the array as the former starts
   ! from 0 for each group of procs that are on the same node.
   ! This means hostrank will work for cases where the procs are
