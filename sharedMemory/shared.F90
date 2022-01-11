@@ -51,7 +51,10 @@ program sharedmemtest
                                    ! the part of the window covered by another
                                    ! process until the latter process has
                                    ! finished its work in the window too.
-  matrix_elementsy=0.0_dp
+  if (hostrank == 0) then
+     matrix_elementsy=0.0_dp
+  endif
+  CALL MPI_WIN_FENCE(0, win, ierr)
   if (hostrank == 0) then ! Use hostrank not my_rank here as the former starts
                           ! from 0 for each subgroup so this is more general
                           ! (e.g. if there were four procs in two subgroups, 1,2
