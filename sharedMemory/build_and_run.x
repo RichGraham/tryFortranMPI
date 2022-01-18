@@ -1,2 +1,2 @@
 make
-mpirun -np 4 ./mpi_fortran.out
+mpirun -np 1 ./mpi_fortran.out
