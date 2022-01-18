@@ -7,7 +7,7 @@ program sharedmemtest
   INTEGER(KIND=MPI_ADDRESS_KIND) :: windowsize
   INTEGER :: disp_unit,my_rank,ierr,total,i,j
   INTEGER :: N_Comms_Per_Node,arraySize(2)
-  INTEGER :: arrayIndex
+  INTEGER :: arrayIndex, repeat
   TYPE(C_PTR) :: baseptr, baseptr2
   real(dp), POINTER :: matrix_elementsy(:,:)
   integer,allocatable :: shapeArray(:)
@@ -28,7 +28,7 @@ program sharedmemtest
   ! Allocate array that specifies shape of matrix procs will edit
   allocate(shapeArray(2),shapeArray2(2))
   shapeArray=(/ N_Comms_Per_Node,2 /)
-  shapeArray2=(/ 40000,40000 /)
+  shapeArray2=(/ 400,400 /)
 
   ! Specify size of window where shared array is located
   if (hostrank == 0) then ! Window will be shared between procs so only need to specify it's size on root
@@ -102,7 +102,7 @@ program sharedmemtest
 
   ! Set up in same way as first example
   if (hostrank == 0) then
-    windowsize = int(2*10**9,MPI_ADDRESS_KIND)*8_MPI_ADDRESS_KIND
+    windowsize = int(2*10**6,MPI_ADDRESS_KIND)*8_MPI_ADDRESS_KIND
   else
     windowsize = 0_MPI_ADDRESS_KIND
   end if
@@ -126,8 +126,11 @@ program sharedmemtest
 
   ! Fill the array
   arrayTime = MPI_Wtime()
-  bigArray((hostrank*arrayIndex)+1:(hostrank+1)*arrayIndex,:) = &
-  (2d0*hostrank+2d0)**2
+  do repeat = 1, 150000
+     
+     bigArray((hostrank*arrayIndex)+1:(hostrank+1)*arrayIndex,:) = bigArray((hostrank*arrayIndex)+1:(hostrank+1)*arrayIndex,:)+ &
+          (2d0*hostrank+2d0)
+  enddo
   arrayTime = MPI_Wtime() - arrayTime
   CALL MPI_WIN_FENCE(0, win, ierr)
 
